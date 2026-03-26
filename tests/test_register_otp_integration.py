@@ -61,8 +61,9 @@ def test_registration_engine_resend_flow_propagates_new_otp_timestamp_and_valida
     engine.email_service = FakeEmailService()
     engine.session = FakeSession()
     engine._otp_sent_at = None
+    engine.phase_history = []
 
-    issued_timestamps = iter([1000.0, 1005.0])
+    issued_timestamps = iter([1000.0, 1000.0, 1000.0, 1005.0, 1005.0, 1005.0])
     monkeypatch.setattr("src.core.register.time.time", lambda: next(issued_timestamps))
 
     assert engine._send_verification_code() is True

@@ -254,14 +254,6 @@ class FreemailService(BaseEmailService):
                     if "openai" not in content.lower():
                         continue
 
-                    v_code = str(mail.get("verification_code") or "").strip()
-                    if re.fullmatch(r"\d{6}", v_code):
-                        if not self._accept_verification_code(email, v_code, message_marker):
-                            continue
-                        logger.info(f"从 Freemail 邮箱 {email} 找到验证码: {v_code}")
-                        self.update_status(True)
-                        return v_code
-
                     code = self._extract_otp_from_text(content, pattern)
                     if code:
                         if not self._accept_verification_code(email, code, message_marker):
@@ -283,6 +275,14 @@ class FreemailService(BaseEmailService):
                             return code
                     except Exception as e:
                         logger.debug(f"获取 Freemail 邮件详情失败: {e}")
+
+                    v_code = str(mail.get("verification_code") or "").strip()
+                    if re.fullmatch(r"\d{6}", v_code):
+                        if not self._accept_verification_code(email, v_code, message_marker):
+                            continue
+                        logger.info(f"从 Freemail 邮箱 {email} 找到验证码: {v_code}")
+                        self.update_status(True)
+                        return v_code
 
             except Exception as e:
                 logger.debug(f"检查 Freemail 邮件时出错: {e}")
